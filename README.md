@@ -32,18 +32,3 @@ cd FBSH
 chmod +x security-check.sh
 sudo ./security-check.sh
 
-Output
-Full log saved automatically to a file like:
-security-report-20250603_144500.log
-
-Best Practices
-Review the script before execution on production systems.
-Change the default SSH port (22) if detected.
-Ensure all users have strong passwords.
-Enable and configure your firewall (ufw or iptables).
-
-🔒Requirements
-Bash
-sudo privileges
-ufw, iptables, ss or netstat, systemctl
-
