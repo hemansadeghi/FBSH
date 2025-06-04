@@ -1,5 +1,16 @@
 # 🔐 FBSH
 
+```text
+    ______ _     _____ _    _ 
+   |  ____| |   | ____| |  | |
+   | |__  | |__ | |__ | |__| |
+   |  __| | '_ \|  __||  __  |
+   | |____| | | | |___| |  | |
+   |______|_| |_|_____/_|  |_|
+
+   Fast Bash Security Hardener
+```
+
 A simple and practical Bash script for basic Linux system security auditing.  
 It provides quick insights into your system’s firewall status, open ports, privileged users, and more.
 
@@ -7,28 +18,34 @@ It provides quick insights into your system’s firewall status, open ports, pri
 
 ## ✅ What It Checks
 
-- **Firewall** status via `ufw` and `iptables`  
-- **Open ports** using `ss` or `netstat`  
-- **Running services** (via `systemctl`)  
-- **Users without passwords** (parsed from `/etc/shadow`)  
-- **Users with sudo privileges**  
-- **SSH port** (detect if default 22 is still in use)
+- 🔥 **Firewall** status via `ufw` and `iptables`  
+- 🌐 **Open ports** using `ss` or `netstat`  
+- ⚙️ **Running services** via `systemctl`  
+- 🔐 **Users without passwords** (from `/etc/shadow`)  
+- 👑 **Users with sudo privileges**  
+- 🚪 **SSH port** – detect if default `22` is still in use
 
 ---
 
 ## 🚀 Quick Start
 
-### 🔧 Run directly using `curl`
+### 🧰 Option 1: Run directly using `curl`
 
 ```bash
 bash <(curl -s https://raw.githubusercontent.com/hemansadeghi/FBSH/main/security-check.sh)
- 
+```
 
- or 
+### 📦 Option 2: Clone and run manually
 
-````bash 
+```bash
 git clone https://github.com/hemansadeghi/FBSH.git
 cd FBSH
 chmod +x security-check.sh
 sudo ./security-check.sh
+```
 
+---
+
+## 📄 License
+
+MIT – © Hemansadeghi, 2025
