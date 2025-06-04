@@ -114,5 +114,27 @@ else
   log_msg "$GREEN" " SSH is running on custom port ($SSH_PORT)."
 fi
 
+# 7. Cron Jobs check
+print_section "Cron Jobs"
+
+echo -e "${CYAN}-- System-wide cron jobs (/etc/crontab and /etc/cron.*)${NC}"
+cat /etc/crontab >> "$LOG_FILE" 2>/dev/null
+echo "" >> "$LOG_FILE"
+
+for dir in /etc/cron.hourly /etc/cron.daily /etc/cron.weekly /etc/cron.monthly; do
+  echo -e "${CYAN}-- Jobs in $dir${NC}"
+  ls -l "$dir" >> "$LOG_FILE" 2>/dev/null
+  echo "" >> "$LOG_FILE"
+done
+
+echo -e "${CYAN}-- User cron jobs${NC}"
+users=$(awk -F: '($7 !~ /(nologin|false)/) {print $1}' /etc/passwd)
+
+for user in $users; do
+  echo -e "${YELLOW}Cron jobs for user: $user${NC}"
+  crontab -l -u "$user" >> "$LOG_FILE" 2>/dev/null || echo "No cron jobs for $user" >> "$LOG_FILE"
+  echo "" >> "$LOG_FILE"
+done
+
 echo -e "\n Full report saved to: ${YELLOW}${LOG_FILE}${NC}"
 log_msg "$GREEN" "Security audit completed."
