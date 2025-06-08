@@ -56,6 +56,7 @@ log_msg() {
 echo -e "\n ${YELLOW}Starting security audit...${NC}\n"
 echo " FBSH Security Report - $(date)" > "$LOG_FILE"
 
+# ─────────────── FIREWALL CHECK ───────────────
 print_section "Firewall status (UFW + iptables)"
 if command -v ufw &>/dev/null; then
   UFW_STATUS=$(ufw status | grep Status)
@@ -76,6 +77,7 @@ else
   log_msg "$RED" "iptables is not installed."
 fi
 
+# ─────────────── OPEN PORTS ───────────────
 print_section "Open ports"
 if command -v ss &>/dev/null; then
   ss -tuln | tee -a "$LOG_FILE"
@@ -83,9 +85,11 @@ else
   netstat -tuln | tee -a "$LOG_FILE"
 fi
 
+# ─────────────── RUNNING SERVICES ───────────────
 print_section "Running services"
 systemctl list-units --type=service --state=running | head -n 20 | tee -a "$LOG_FILE"
 
+# ─────────────── EMPTY PASSWORD USERS ───────────────
 print_section "Users without password"
 awk -F: '($2==""){print $1}' /etc/shadow > /tmp/empty_pass_users.txt
 if [ -s /tmp/empty_pass_users.txt ]; then
@@ -96,14 +100,14 @@ else
 fi
 rm -f /tmp/empty_pass_users.txt
 
+# ─────────────── SUDO USERS ───────────────
 print_section "Users with sudo privileges"
 getent group sudo | cut -d: -f4 | tr ',' '\n' | tee -a "$LOG_FILE"
 
+# ─────────────── SSH PORT ───────────────
 print_section "SSH port check"
 SSH_PORT=$(grep "^Port" /etc/ssh/sshd_config 2>/dev/null | awk '{print $2}')
-if [ -z "$SSH_PORT" ]; then
-  SSH_PORT=22
-fi
+[ -z "$SSH_PORT" ] && SSH_PORT=22
 
 if [ "$SSH_PORT" = "22" ]; then
   log_msg "$YELLOW" " SSH is running on default port (22). Consider changing it."
@@ -111,6 +115,7 @@ else
   log_msg "$GREEN" " SSH is running on custom port ($SSH_PORT)."
 fi
 
+# ─────────────── CRON JOBS ───────────────
 print_section "Cron Jobs"
 echo -e "${CYAN}-- System-wide cron jobs (/etc/crontab and /etc/cron.*)${NC}"
 cat /etc/crontab >> "$LOG_FILE" 2>/dev/null
@@ -124,13 +129,13 @@ done
 
 echo -e "${CYAN}-- User cron jobs${NC}"
 users=$(awk -F: '($7 !~ /(nologin|false)/) {print $1}' /etc/passwd)
-
 for user in $users; do
   echo -e "${YELLOW}Cron jobs for user: $user${NC}"
   crontab -l -u "$user" >> "$LOG_FILE" 2>/dev/null || echo "No cron jobs for $user" >> "$LOG_FILE"
   echo "" >> "$LOG_FILE"
 done
 
+# ─────────────── PACKAGES ───────────────
 print_section "Vulnerable/Upgradable packages"
 if command -v apt &>/dev/null; then
   log_msg "$CYAN" "Using APT to check for upgradable packages..."
@@ -145,6 +150,7 @@ else
   log_msg "$YELLOW" "No supported package manager (apt/yum/dnf) found to check updates."
 fi
 
+# ─────────────── SUDOERS ENTRIES ───────────────
 print_section "Custom sudoers entries"
 log_msg "$CYAN" "Scanning /etc/sudoers and /etc/sudoers.d/ for entries allowing ALL commands..."
 
@@ -156,5 +162,23 @@ if [ -d /etc/sudoers.d ]; then
   grep -rE '^[^#].*ALL' /etc/sudoers.d/ | tee -a "$LOG_FILE"
 fi
 
-echo -e "\n Full report saved to: ${YELLOW}${LOG_FILE}${NC}"
+# ─────────────── ROOTKIT CHECK ───────────────
+print_section "Rootkit detection"
+
+if command -v chkrootkit &>/dev/null; then
+  log_msg "$CYAN" "Running chkrootkit..."
+  chkrootkit | tee -a "$LOG_FILE"
+else
+  log_msg "$YELLOW" "chkrootkit is not installed."
+fi
+
+if command -v rkhunter &>/dev/null; then
+  log_msg "$CYAN" "Running rkhunter (this may take a while)..."
+  rkhunter --check --sk | tee -a "$LOG_FILE"
+else
+  log_msg "$YELLOW" "rkhunter is not installed."
+fi
+
+# ─────────────── DONE ───────────────
 log_msg "$GREEN" "Security audit completed."
+echo -e "\n Full report saved to: ${YELLOW}${LOG_FILE}${NC}"
