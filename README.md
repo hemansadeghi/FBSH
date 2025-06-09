@@ -27,7 +27,7 @@ It provides quick insights into your system’s security posture, highlighting w
 
 ## ✅ What It Checks
 
-* 🔥 **Firewall** status via `ufw` and `iptables`
+* 🔥 **Firewall** status via `ufw`, `firewalld`, and `iptables`
 * 🌐 **Open ports** using `ss` or `netstat`
 * ⚙️ **Running services** via `systemctl`
 * 🔐 **Users without passwords** (from `/etc/shadow`)
@@ -36,6 +36,9 @@ It provides quick insights into your system’s security posture, highlighting w
 * 📆 **Vulnerable or outdated packages** via `apt`, `yum`, or `dnf`
 * 📜 **Sudoers configuration** – checks for overly permissive `ALL` rules in `/etc/sudoers` and `/etc/sudoers.d`
 * 🕵️‍♂️ **Rootkit detection** using `chkrootkit` and `rkhunter` (if installed)
+* 💬 Displays a clear colored startup notification
+* 🎨 Includes an ASCII art logo banner for better branding and UX
+
 
 ---
 
