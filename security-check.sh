@@ -41,6 +41,9 @@ cat << "EOF"
 EOF
 echo -e "${NC}"
 
+echo -e "\n ${YELLOW}Starting security audit...${NC}\n"
+echo " FBSH Security Report - $(date)" > "$LOG_FILE"
+
 print_section() {
   echo -e "\n${CYAN}==> $1${NC}"
   echo -e "\n==> $1" >> "$LOG_FILE"
@@ -52,9 +55,6 @@ log_msg() {
   echo -e "${color}${msg}${NC}"
   echo "$msg" >> "$LOG_FILE"
 }
-
-echo -e "\n ${YELLOW}Starting security audit...${NC}\n"
-echo " FBSH Security Report - $(date)" > "$LOG_FILE"
 
 # ─────────────── FIREWALL CHECK ───────────────
 print_section "Firewall status (UFW + iptables)"
