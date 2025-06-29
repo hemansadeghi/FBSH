@@ -162,6 +162,39 @@ if [ -d /etc/sudoers.d ]; then
   grep -rE '^[^#].*ALL' /etc/sudoers.d/ | tee -a "$LOG_FILE"
 fi
 
+
+# Spinner function for running commands with spinner
+run_with_spinner() {
+  # $1 = command to run (string)
+  # $2 = message to display while running
+
+  local cmd=$1
+  local msg=$2
+  local pid
+  local spinner='|/-\'
+  local i=0
+
+  echo -ne "${CYAN}${msg}... ${NC}"
+
+  bash -c "$cmd" >> "$LOG_FILE" 2>&1 &
+  pid=$!
+
+  while kill -0 $pid 2>/dev/null; do
+    i=$(( (i+1) %4 ))
+    printf "\b${spinner:$i:1}"
+    sleep 0.2
+  done
+  wait $pid
+  local status=$?
+
+  if [ $status -eq 0 ]; then
+    echo -e "\b${GREEN}done${NC}"
+  else
+    echo -e "\b${RED}failed${NC}"
+  fi
+  return $status
+}
+
 # ─────────────── ROOTKIT CHECK ───────────────
 print_section "Rootkit detection"
 
