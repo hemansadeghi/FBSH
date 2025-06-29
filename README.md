@@ -38,6 +38,9 @@ It provides quick insights into your system’s security posture, highlighting w
 * 🕵️‍♂️ **Rootkit detection** using `chkrootkit` and `rkhunter` (if installed)
 * 💬 Displays a clear colored startup notification
 * 🎨 Includes an ASCII art logo banner for better branding and UX
+* 🕹️ Rootkit detection commands (`chkrootkit` and `rkhunter`) are run with a spinner animation for improved user experience.
+* 📁 The complete security report is saved to a timestamped log file in the current working directory for review.
+* ⚠️ Run the script as `root` or via `sudo` to ensure all checks perform correctly.
 
 
 ---
